@@ -1,10 +1,11 @@
 const { Client, Events, GatewayIntentBits } = require('discord.js');
 const { token } = require('./config.json');
-var https = require("https");
+const https = require("https");
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-var baseurl = "https://ddnet.org/players/?json2=";
+const baseurl = "https://ddnet.org/players/?json2=";
+const PREFIX = "#!";
 
 function sleep(ms) {
   return new Promise((resolve) => {
@@ -13,20 +14,17 @@ function sleep(ms) {
 }
 
 function buildTimeFromDec(dec) {
-    var hours = Math.floor(dec / 60 / 60);
-    var minutes = Math.floor((dec / 60)%60);
-    var seconds = Math.floor(dec % 60);
-
-    return String(hours).padStart(2, 0) + ":" + String(minutes).padStart(2, 0) + ":" + String(seconds).padStart(2, 0);
+	// convert from unix time to string (multiply by 1000 because js has in ms not s)
+	return new Date(dec*1000).toLocaleString();
 }
 
-var usernames = ['Elysian', 'TheFlexbert', 'pegecko', 'Happy+GrandPa', 'levi'];
+var usernames = ['Elysian', 'TheFlexbert', 'pegecko', 'Happy GrandPa', 'levi'];
 function get_current_time(username) {
     if(username==null) {
         return;
     }
 
-    var url = baseurl+username;
+    var url = baseurl+EncodeURIComponent(username);
 
     console.log('Fetching current time for: ' + username + ": " + url);
 
@@ -105,6 +103,12 @@ client.once(Events.ClientReady, async (c) => {
     console.log(`Ready! Logged in as ${c.user.tag}`);
     await mainloop();
 });
+client.on("message", (msg) => {
+	if(msg.content.startsWith(PREFIX) {
+		let str = msg.content.substring(PREFIX.length);
+		msg.reply(get_current_time(str.split(" ")[0])
+	}
+})
 
 client.login(token);
 
